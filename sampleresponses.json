@@ -1,0 +1,149 @@
+[
+  {
+    "object": "whatsapp_business_account",
+    "entry": [
+      {
+        "id": "237337342792544",
+        "changes": [
+          {
+            "value": {
+              "messaging_product": "whatsapp",
+              "metadata": {
+                "display_phone_number": "15551313619",
+                "phone_number_id": "221347174398204"
+              },
+              "contacts": [
+                { "profile": { "name": "Christoph" }, "wa_id": "4915111697460" }
+              ],
+              "messages": [
+                {
+                  "from": "4915111697460",
+                  "id": "wamid.HBgNNDkxNTExMTY5NzQ2MBUCABIYIEJBQTBFMEVDMEU4RERCQ0Y4MUQ1N0NFQ0Y2MjQ2NTlFAA==",
+                  "timestamp": "1707659782",
+                  "text": { "body": "Huhu" },
+                  "type": "text"
+                }
+              ]
+            },
+            "field": "messages"
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    "object": "whatsapp_business_account",
+    "entry": [
+      {
+        "id": "237337342792544",
+        "changes": [
+          {
+            "value": {
+              "messaging_product": "whatsapp",
+              "metadata": {
+                "display_phone_number": "15551313619",
+                "phone_number_id": "221347174398204"
+              },
+              "statuses": [
+                {
+                  "id": "wamid.HBgNNDkxNTExMTY5NzQ2MBUCABEYEjBEMTMyQzUwNzVEN0VENUVFQgA=",
+                  "status": "sent",
+                  "timestamp": "1707662983",
+                  "recipient_id": "4915111697460",
+                  "conversation": {
+                    "id": "be597e2d79f79bc43625f7f6e352656a",
+                    "expiration_timestamp": "1707749280",
+                    "origin": { "type": "service" }
+                  },
+                  "pricing": {
+                    "billable": true,
+                    "pricing_model": "CBP",
+                    "category": "service"
+                  }
+                }
+              ]
+            },
+            "field": "messages"
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    "object": "whatsapp_business_account",
+    "entry": [
+      {
+        "id": "237337342792544",
+        "changes": [
+          {
+            "value": {
+              "messaging_product": "whatsapp",
+              "metadata": {
+                "display_phone_number": "15551313619",
+                "phone_number_id": "221347174398204"
+              },
+              "statuses": [
+                {
+                  "id": "wamid.HBgNNDkxNTExMTY5NzQ2MBUCABEYEjBEMTMyQzUwNzVEN0VENUVFQgA=",
+                  "status": "delivered",
+                  "timestamp": "1707662983",
+                  "recipient_id": "4915111697460",
+                  "conversation": {
+                    "id": "be597e2d79f79bc43625f7f6e352656a",
+                    "origin": { "type": "service" }
+                  },
+                  "pricing": {
+                    "billable": true,
+                    "pricing_model": "CBP",
+                    "category": "service"
+                  }
+                }
+              ]
+            },
+            "field": "messages"
+          }
+        ]
+      }
+    ]
+  },
+
+  {
+    "object": "whatsapp_business_account",
+    "entry": [
+      {
+        "id": "237337342792544",
+        "changes": [
+          {
+            "value": {
+              "messaging_product": "whatsapp",
+              "metadata": {
+                "display_phone_number": "15551313619",
+                "phone_number_id": "221347174398204"
+              },
+              "statuses": [
+                {
+                  "id": "wamid.HBgNNDkxNTExMTY5NzQ2MBUCABEYEjBEMTMyQzUwNzVEN0VENUVFQgA=",
+                  "status": "read",
+                  "timestamp": "1707662983",
+                  "recipient_id": "4915111697460",
+                  "conversation": {
+                    "id": "be597e2d79f79bc43625f7f6e352656a",
+                    "origin": { "type": "service" }
+                  },
+                  "pricing": {
+                    "billable": true,
+                    "pricing_model": "CBP",
+                    "category": "service"
+                  }
+                }
+              ]
+            },
+            "field": "messages"
+          }
+        ]
+      }
+    ]
+  }
+]

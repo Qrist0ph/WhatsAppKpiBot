@@ -1,0 +1,6 @@
+@WhatsAppKpiBot_HostAddress = http://localhost:5106
+
+GET {{WhatsAppKpiBot_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
