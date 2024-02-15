@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using Google.Analytics.Data.V1Beta;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WhatsAppKpiBot.Controllers;
@@ -22,14 +23,34 @@ public class KpiBotController : ControllerBase
             try
             {
                 var receivedMessage = JsonSerializer.Deserialize<RootObject>(requestBody);
-                await SendToWhatsApp(receivedMessage.entry[0].changes[0].value.messages[0].text.body, receivedMessage.entry[0].changes[0].value.messages[0].from);
+                var query = receivedMessage.entry[0].changes[0].value.messages[0].text.body;
+
+                var answer = GetGptAnswer(query);
+                await SendToWhatsApp(answer, receivedMessage.entry[0].changes[0].value.messages[0].from);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine(e.StackTrace);
             }
+
             return Content("POST request processed successfully");
         }
+    }
+
+    public static string GetGptAnswer(string query)
+    {
+        var gptApiKey = Environment.GetEnvironmentVariable("gptapikey");
+        var args = GptQuery.AskQuestion(query, gptApiKey);
+
+        var answer =
+            string.Join("\r\n\r\n", GetGoogleAnalyticsMetrics("330445318", args).Take(10).Select(r => r.ToString()));
+        return answer;
+    }
+
+
+    public void AskGpt()
+    {
+        //ask chatgpt api
     }
 
 
@@ -63,7 +84,7 @@ public class KpiBotController : ControllerBase
     }
 
     /// <summary>
-    /// Do a Meta API call and send messages to WhatsApp
+    ///     Do a Meta API call and send messages to WhatsApp
     /// </summary>
     /// <param name="messageText"></param>
     /// <param name="to"></param>
@@ -99,5 +120,153 @@ public class KpiBotController : ControllerBase
 
         Console.WriteLine(response.StatusCode);
         Console.WriteLine(responseBody);
+    }
+
+    /// <summary>
+    ///     Check https://ga-dev-tools.google/ga4/query-explorer/
+    ///     https://developers.google.com/analytics/devguides/reporting/data/v1/api-schema#metrics
+    /// </summary>
+    /// <param name="propertyId"></param>
+    /// <returns></returns>
+    public static IEnumerable<ReportDataRow> GetGoogleAnalyticsMetrics(string propertyId, Dictionary<string, string> args)
+    {
+        string dimension, metric, startDate, endDate;
+
+        if (args.TryGetValue("Dimension", out dimension))
+        {
+            //do something
+        }
+
+        args.TryGetValue("Metric", out metric);
+
+        if (!args.TryGetValue("startDate", out startDate))
+        {
+            startDate = DateTime.Now.AddDays(-10).ToString("yyyy-MM-dd");
+        }
+
+        if (!args.TryGetValue("endDate", out endDate))
+        {
+            endDate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+        }
+
+        if (startDate.Equals("<yyyy-MM-dd>"))
+        {
+            startDate = DateTime.Now.AddDays(-30).ToString("yyyy-MM-dd");
+            endDate = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+        }
+
+
+        Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "/app/data/credentials.json");
+        var client = new BetaAnalyticsDataClientBuilder().Build();
+
+        RunReportRequest request = null;
+
+        if (dimension == null)
+            request = new RunReportRequest
+            {
+                Property = "properties/" + propertyId,
+                //Dimensions =
+                //{
+                //    new Dimension
+                //    {
+                //        Name = dimension
+                //    }
+                //},
+                Metrics =
+                {
+                    new Metric
+                    {
+                        Name = metric
+                    }
+                },
+                DateRanges =
+                {
+                    new DateRange
+                    {
+                        StartDate = startDate,
+                        EndDate = endDate
+                    }
+                }
+            };
+
+        else
+            request = new RunReportRequest
+            {
+                Property = "properties/" + propertyId,
+                Dimensions =
+                {
+                    new Dimension
+                    {
+                        Name = dimension
+                    }
+                },
+                Metrics =
+                {
+                    new Metric
+                    {
+                        Name = metric
+                    }
+                },
+                DateRanges =
+                {
+                    new DateRange
+                    {
+                        StartDate = startDate,
+                        EndDate = endDate
+                    }
+                }
+            };
+        //return client.RunReport(request).Rows.Select(row => $"Campaign: {row.DimensionValues[0].Value} - Revenue: {row.MetricValues[0].Value} - Cost: {row.MetricValues[1].Value}");
+
+        client.RunReport(request);
+        // Assuming client.RunReport(request) returns IEnumerable<Row> or similar collection
+        var reportData = client.RunReport(request).Rows.Select(row =>
+                new ReportDataRow
+                {
+                    Campaign = row.DimensionValues.Count > 0 ? row.DimensionValues[0].Value : null,
+                    Revenue = double.Parse(row.MetricValues[0].Value)
+                })
+            .ToList();
+
+
+        return reportData;
+    }
+
+    public class ReportDataRow
+    {
+        public string Campaign { get; set; }
+        public double Revenue { get; set; }
+        public double Cost { get; set; }
+
+        public double Roas => Cost != 0d ? Revenue / Cost : 0;
+
+        public override string ToString()
+        {
+            var warnung = string.Empty;
+            if (Roas == 0)
+            {
+            }
+            else if (Roas < 1)
+            {
+                warnung = "\ud83d\udfe5";
+            }
+            else if (Roas < 4)
+            {
+                warnung = "\ud83d\udfe8";
+            }
+
+            //var ci = new CultureInfo("de-DE");
+            return $"{TruncateString(Campaign, 8)} -  {Revenue.ToString("F")} ";
+        }
+
+        public static string TruncateString(string value, int maxLength)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            return value.Length <= maxLength ? value : value.Substring(0, maxLength);
+        }
     }
 }
